@@ -6,6 +6,7 @@ namespace OpenSpout\Common\Entity;
 
 use DateInterval;
 use DateTimeInterface;
+use OpenSpout\Common\Entity\Comment\TextRun;
 use OpenSpout\Common\Entity\Style\Style;
 
 final class Row
@@ -37,11 +38,11 @@ final class Row
     }
 
     /**
-     * @param list<null|bool|DateInterval|DateTimeInterface|float|int|string> $cellValues
+     * @param list<null|bool|DateInterval|DateTimeInterface|float|int|string|TextRun[]> $cellValues
      */
     public static function fromValues(array $cellValues = [], ?Style $rowStyle = null): self
     {
-        $cells = array_map(static function (bool|DateInterval|DateTimeInterface|float|int|string|null $cellValue): Cell {
+        $cells = array_map(static function (array|bool|DateInterval|DateTimeInterface|float|int|string|null $cellValue): Cell {
             return Cell::fromValue($cellValue);
         }, $cellValues);
 
@@ -49,12 +50,12 @@ final class Row
     }
 
     /**
-     * @param array<array-key, null|bool|DateInterval|DateTimeInterface|float|int|string> $cellValues
+     * @param array<array-key, null|bool|DateInterval|DateTimeInterface|float|int|string|TextRun[]> $cellValues
      * @param array<array-key, Style>                                                     $columnStyles
      */
     public static function fromValuesWithStyles(array $cellValues = [], ?Style $rowStyle = null, array $columnStyles = []): self
     {
-        $cells = array_map(static function (bool|DateInterval|DateTimeInterface|float|int|string|null $cellValue, int|string $key) use ($columnStyles): Cell {
+        $cells = array_map(static function (array|bool|DateInterval|DateTimeInterface|float|int|string|null $cellValue, int|string $key) use ($columnStyles): Cell {
             return Cell::fromValue($cellValue, $columnStyles[$key] ?? null);
         }, $cellValues, array_keys($cellValues));
 
@@ -143,11 +144,11 @@ final class Row
     }
 
     /**
-     * @return list<null|bool|DateInterval|DateTimeInterface|float|int|string> The row values, as array
+     * @return list<null|bool|DateInterval|DateTimeInterface|float|int|string|TextRun[]> The row values, as array
      */
     public function toArray(): array
     {
-        return array_map(static function (Cell $cell): bool|DateInterval|DateTimeInterface|float|int|string|null {
+        return array_map(static function (Cell $cell): array|bool|DateInterval|DateTimeInterface|float|int|string|null {
             return $cell->getValue();
         }, $this->cells);
     }
