@@ -13,7 +13,9 @@ use OpenSpout\Common\Entity\Cell\EmptyCell;
 use OpenSpout\Common\Entity\Cell\FormulaCell;
 use OpenSpout\Common\Entity\Cell\NumericCell;
 use OpenSpout\Common\Entity\Cell\StringCell;
+use OpenSpout\Common\Entity\Cell\TextRunCell;
 use OpenSpout\Common\Entity\Comment\Comment;
+use OpenSpout\Common\Entity\Comment\TextRun;
 use OpenSpout\Common\Entity\Style\Style;
 
 abstract class Cell
@@ -27,7 +29,10 @@ abstract class Cell
         $this->setStyle($style);
     }
 
-    abstract public function getValue(): bool|DateInterval|DateTimeInterface|float|int|string|null;
+    /**
+     * @return bool|DateInterval|DateTimeInterface|float|int|string|null|TextRun[]
+     */
+    abstract public function getValue(): array|bool|DateInterval|DateTimeInterface|float|int|string|null;
 
     final public function setStyle(?Style $style): void
     {
@@ -39,8 +44,14 @@ abstract class Cell
         return $this->style;
     }
 
-    final public static function fromValue(bool|DateInterval|DateTimeInterface|float|int|string|null $value, ?Style $style = null): self
+    /**
+     * @param bool|DateInterval|DateTimeInterface|float|int|string|null|TextRun[] $value
+     */
+    final public static function fromValue(array|bool|DateInterval|DateTimeInterface|float|int|string|null $value, ?Style $style = null): self
     {
+        if (\is_array($value)) {
+            return new TextRunCell($value, $style);
+        }
         if (\is_bool($value)) {
             return new BooleanCell($value, $style);
         }
